@@ -17,6 +17,9 @@
 
 extern SPI_HandleTypeDef hspi1;
 
+/* Define the global WIZCHIP handle required by the ioLibrary */
+WIZCHIPHandle_t WIZCHIP;
+
 static WIZ5500_Config    _cfg;
 static volatile uint32_t _dropped_packets = 0u;
 
@@ -29,9 +32,8 @@ static volatile TxPhase _phase = PHASE_IDLE;
 /* ── Shadow TX write pointer ─────────────────────────────────────────── */
 static uint16_t _tx_wr = 0u;
 
-/* ── Pre-built SPI headers ───────────────────────────────────────────── */
+/* ── Pre-built SPI header ───────────────────────────────────────────── */
 static uint8_t _tx_header[3] = {0, 0, W5500_CTRL_S0TX_W};
-static uint8_t _cr_send[4]   = {0, 0, W5500_CTRL_S0R_W, Sn_CR_SEND};
 
 /* ── ioLibrary callbacks ────────────────────────────────────────────── */
 static void    _cs_sel(void)  { HAL_GPIO_WritePin(ETH_CS_PORT,ETH_CS_PIN,GPIO_PIN_RESET); }
@@ -45,10 +47,15 @@ static void    _ce(void) { __enable_irq();  }
 
 static void _wizchip_init(void)
 {
-    reg_wizchip_cs_cbfunc(_cs_sel, _cs_dsel);
-    reg_wizchip_spi_cbfunc(_rb, _wb);
-    reg_wizchip_spiburst_cbfunc(_rburst, _wburst);
-    reg_wizchip_cris_cbfunc(_ci, _ce);
+    memset(&WIZCHIP, 0, sizeof(WIZCHIPHandle_t));
+    WIZCHIP.CS._select         = _cs_sel;
+    WIZCHIP.CS._deselect       = _cs_dsel;
+    WIZCHIP.IF.SPI._write_byte  = _wb;
+    WIZCHIP.IF.SPI._read_byte   = _rb;
+    WIZCHIP.IF.SPI._write_burst = _wburst;
+    WIZCHIP.IF.SPI._read_burst  = _rburst;
+    WIZCHIP.CRIS._enter        = _ci;
+    WIZCHIP.CRIS._exit         = _ce;
 }
 
 static void _hw_reset(void)
@@ -98,8 +105,7 @@ WIZ5500_Status WIZ5500_SendBatch(const uint8_t *src, uint16_t len)
 {
     if (!src || len > 2048) return WIZ5500_ERR_PARAM;
 
-    /* If SPI DMA is still busy, we can't start a new transfer.
-     * With 2000 pkts/s and 32MHz SPI, this should rarely happen. */
+    /* If SPI DMA is still busy, we can't start a new transfer. */
     if (_phase == PHASE_BUSY) {
         _dropped_packets++;
         return WIZ5500_ERR_BUSY;
