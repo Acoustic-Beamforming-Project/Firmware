@@ -89,8 +89,8 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
         hdma_spi2_rx.Init.Direction           = DMA_PERIPH_TO_MEMORY;
         hdma_spi2_rx.Init.PeriphInc           = DMA_PINC_DISABLE;
         hdma_spi2_rx.Init.MemInc              = DMA_MINC_ENABLE;
-        hdma_spi2_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;  /* 16-bit SPI */
-        hdma_spi2_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_HALFWORD;
+        hdma_spi2_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;      /* 8-bit SPI */
+        hdma_spi2_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
         hdma_spi2_rx.Init.Mode                = DMA_NORMAL;
         hdma_spi2_rx.Init.Priority            = DMA_PRIORITY_VERY_HIGH;
         hdma_spi2_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;     /* direct mode for RX */
@@ -132,8 +132,8 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
         hdma_spi3_rx.Init.Direction           = DMA_PERIPH_TO_MEMORY;
         hdma_spi3_rx.Init.PeriphInc           = DMA_PINC_DISABLE;
         hdma_spi3_rx.Init.MemInc              = DMA_MINC_ENABLE;
-        hdma_spi3_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;  /* 16-bit SPI */
-        hdma_spi3_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_HALFWORD;
+        hdma_spi3_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;      /* 8-bit SPI */
+        hdma_spi3_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
         hdma_spi3_rx.Init.Mode                = DMA_NORMAL;
         hdma_spi3_rx.Init.Priority            = DMA_PRIORITY_VERY_HIGH;
         hdma_spi3_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;     /* direct mode for RX */
